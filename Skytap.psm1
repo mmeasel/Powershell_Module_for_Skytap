@@ -511,6 +511,29 @@ function Publish-URL ([string]$configId, [string]$ptype, [string]$pname,[Boolean
 				}
 			return $result
 			}
+			
+function Edit-PublishSet ( [string]$configId, [string]$publishSetId, $configAttributes ){
+<#
+    .SYNOPSIS
+      Change Publish Set attributes
+    .SYNTAX
+       Edit-PublishSet ConfigId PublishSetId Attribute-Hash
+    .EXAMPLE
+      Edit-PublishSet 12345 12345 @{name='config 1234'; password='secret'}
+  #>
+	try {
+		$uri = "$url/configurations/$configId/publish_sets/$publishSetId"
+		
+		$body = $configAttributes
+		$result = Invoke-RestMethod -Uri $uri -Method PUT -Body (ConvertTo-Json $body)  -ContentType "application/json" -Headers $headers 
+		$result | Add-member -MemberType NoteProperty -name requestResultCode -value 0
+			} catch { 
+				$global:errorResponse = $_.Exception
+				$result = Show-RequestFailure
+				return $result
+		}
+	return $result
+	}
 
 function Save-ConfigurationToTemplate ([string]$configId, [string]$selectedVMs, [string]$selectedNetworks="none", [string]$tname) {
 <#
